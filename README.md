@@ -1,2 +1,2 @@
 # Spring-Anotation
-description the spring anotation for learning
+description the spring annotation for learning

@@ -1,4 +1,6 @@
-package controller;
+package com.color.controller;
+
+import org.springframework.stereotype.Controller;
 
 /**
  * @author ColorXJH
@@ -6,5 +8,6 @@ package controller;
  * @description:
  * @date 2022/10/20 16:53
  */
+@Controller
 public class MyController {
 }

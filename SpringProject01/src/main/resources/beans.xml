@@ -1,6 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+        <!--包扫描,只要标注了@Controller,@Service,@Repository,@Component注解之一，都会被自动扫描加载到spring的容器中-->
+        <context:component-scan base-package="com.color"></context:component-scan>
+        <bean class="com.color.bean.Person" id="person">
+            <property name="age" value="25">
+            </property>
+            <property name="addr" value="安徽广德">
+            </property>
+            <property name="name" value="张三">
+            </property>
+        </bean>
 </beans>

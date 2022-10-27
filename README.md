@@ -25,3 +25,20 @@
 - @ComponentScan
 > 包扫描，任意@Controller ,@Service,@Repository,@Component注解都会被扫描到并加载到容器中，
 > 该注解可以指定扫描包路径，例如：(value = "com.color")
+- @Scope
+> 用于调整作用域，默认单实例，容器初始化时加载bean，prototype时容器初始化时不加载，只有在调用该bean的时候才会加载，
+> 并且单实例和多实例的对象不一致
+- @Lazy
+> 单实例bean默认在容器启动时创建对象，然后放在容器中，我们可以让其懒加载，
+> 懒加载：容器启动时不创建对象，第一次使用bean时创建对象，并进行初始化操作
+- @Conditional
+> 按照一定的条件进行判断，满足条件则给容器中注册bean,放在类上表示满足条件则所有bean生效，反之亦然
+- @Import
+> 给容器中快速导入一个组件，传统方式时自己在类上写可以被ioc容器识别的bean注解以及高级注解，如果类是第三方包，但是又没有注解
+> 这时我们可以使用该方式：@Bean[导入第三方包中的组件]
+> @Import[快速给容器中导入一个组件]，例如类Color,直接在类上导入该组件，无需创建bean方法，生成bean之后
+> 该bean的id默认是组件的全类名：com.color.bean.Color
+- ImportSelector(在@Import中使用)
+> 导入的选择器，返回需要导入组件的全类名数组
+- ImportBeanDefinitionRegistrar(在@Import中使用)
+> 导入bean定义注册器，通过这个注册器去注册一个beanDefinition(bean的类型)

@@ -1,5 +1,7 @@
 package com.color.bean;
 
+import org.springframework.beans.factory.annotation.Value;
+
 /**
  * @author ColorXJH
  * @version 1.0
@@ -24,10 +26,14 @@ public class Person {
                 ", addr='" + addr + '\'' +
                 '}';
     }
-
-
+    //基本数值
+    //SpEl #{}
+    //${},取出配置文件中的值（在运行的环境变量里面的值）
+    @Value("张三")
     String name;
+    @Value("#{20-2}")
     Integer age;
+    @Value("${person.addr}")
     String addr;
 
     public String getName() {

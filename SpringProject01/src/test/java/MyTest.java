@@ -1,7 +1,7 @@
 import com.color.bean.Person;
-import com.color.config.MainConfigLifeCycle;
-import com.color.config.MyConfig;
-import com.color.config.MyConfig2;
+import com.color.config.*;
+import com.color.controller.MyController;
+import com.color.repository.MyRepository;
 import org.junit.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -77,5 +77,25 @@ public class MyTest {
         AnnotationConfigApplicationContext annotationConfigApplicationContext = new AnnotationConfigApplicationContext(MainConfigLifeCycle.class);
         //关闭容器
         annotationConfigApplicationContext.close();
+    }
+    @Test
+    public void testPropertyValues(){
+        AnnotationConfigApplicationContext application = new AnnotationConfigApplicationContext(MainConfigValues.class);
+        String[] beanDefinitionNames = application.getBeanDefinitionNames();
+        String namess=application.getEnvironment().getProperty("person.addr");
+        System.out.println("--也可以从环境变量中获取配置文件的值--"+namess);
+        System.out.println(application.getBean("person"));
+        for (String name:beanDefinitionNames
+        ) {
+            System.out.println(name);
+        }
+    }
+    @Test
+    public void testAutowired(){
+        AnnotationConfigApplicationContext application = new AnnotationConfigApplicationContext(MainConfigAutowired.class);
+        MyController bean = application.getBean(MyController.class);
+        MyRepository bean1 = application.getBean(MyRepository.class);
+        System.out.println(bean);
+        System.out.println(bean1);
     }
 }

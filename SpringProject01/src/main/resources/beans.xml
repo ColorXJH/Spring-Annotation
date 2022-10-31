@@ -13,4 +13,6 @@
             <property name="name" value="张三">
             </property>
         </bean>
+        <!--导入外部的配置文件位置-->
+        <context:property-placeholder location="classpath:person.properties"></context:property-placeholder>
 </beans>

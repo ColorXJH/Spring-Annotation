@@ -1,5 +1,7 @@
 package com.color.service;
 
+import com.color.repository.MyRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 /**
@@ -10,4 +12,13 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class MyService {
+    @Autowired
+    private MyRepository myRepository;
+
+    @Override
+    public String toString() {
+        return "MyService{" +
+                "myRepository=" + myRepository +
+                '}';
+    }
 }

@@ -49,3 +49,43 @@
 > 同时多实例bean在容器关闭时也不会销毁实例，需要我们自己搜东销毁（即容器不会管理多实例bean）
 - bean实现InitializingBean/DisposableBean
 > 通过实现这两个接口同样可以实现类似初始化以及销毁时方法，因为改接口方法调用时机已经明确
+- JSR250规范注解@PostConstruct,@PreDestroy
+> 在bean注入完成之后需要进行一些初始化操作，在bean销毁之前做一些操作
+> 方法上的注解
+- BeanPostProcessor
+> bean的后置处理器，在bean初始化前后进行处理工作
+> 该接口有两个方法，
+> postProcessBeforeInitialization:在任何初始化回调方法执行前工作
+> postProcessAfterInitialization:在任何初始化回调方法执行之后工作
+- 查看BeanPostProcessor的原理，查看方法的调用栈，从下往上依次执行
+>       Object wrappedBean = bean;
+        if (mbd == null || !mbd.isSynthetic()) {
+        //方法初始化之前执行applyBeanPostProcessorsBeforeInitialization
+        wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);
+        }
+
+		try {
+            //执行初始化方法
+			invokeInitMethods(beanName, wrappedBean, mbd);
+		}
+		catch (Throwable ex) {
+			throw new BeanCreationException(
+					(mbd != null ? mbd.getResourceDescription() : null),
+					beanName, "Invocation of init method failed", ex);
+		}
+
+		if (mbd == null || !mbd.isSynthetic()) {
+        //方法初始化之后执行applyBeanPostProcessorsAfterInitialization
+			wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, beanName);
+		}
+		return wrappedBean;
+
+- spring底层对接口BeanPostProcessor的使用
+> spring底层bean赋值，注入其他组件，@Autowired,生命周期注解，@Async，都是使用BeanPostProcessor来完成的
+- @PropertySource()
+> //加载外部配置文件，使用${}读取内容
+> @PropertySource(value = {"classpath:/person.properties"})
+- @Autowired
+> 自动装配，依赖注入时，IOC容器对各个组件依赖间的赋值
+> 1:默认优先按照类型去容器中找对应组件，找到就赋值
+> 2:如果有多个类型的组件

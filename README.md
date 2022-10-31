@@ -42,3 +42,10 @@
 > 导入的选择器，返回需要导入组件的全类名数组
 - ImportBeanDefinitionRegistrar(在@Import中使用)
 > 导入bean定义注册器，通过这个注册器去注册一个beanDefinition(bean的类型)
+- FactoryBean
+> 使用spring提供的FactoryBean(工厂bean)
+- @Bean(init-method/destroy-method)
+> 对象在初始化时和销毁时调用该类上的方法，注意多实例的时候，初始化并不是在创建容器时，而是在调用时
+> 同时多实例bean在容器关闭时也不会销毁实例，需要我们自己搜东销毁（即容器不会管理多实例bean）
+- bean实现InitializingBean/DisposableBean
+> 通过实现这两个接口同样可以实现类似初始化以及销毁时方法，因为改接口方法调用时机已经明确

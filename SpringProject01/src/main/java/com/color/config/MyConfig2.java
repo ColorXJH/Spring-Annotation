@@ -1,6 +1,7 @@
 package com.color.config;
 
 import com.color.bean.Color;
+import com.color.bean.ColorFactoryBean;
 import com.color.bean.Person;
 import com.color.bean.Red;
 import com.color.condition.MyImportBeanDefinitionRegistrar;
@@ -39,6 +40,9 @@ public class MyConfig2 {
         return new Person("linux",50,"san");
     }
 
-
+    @Bean
+    public ColorFactoryBean colorFactoryBean(){
+        return new ColorFactoryBean();
+    }
 
 }

@@ -6,6 +6,7 @@ import com.color.repository.MyRepository;
 import org.junit.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
+import javax.sql.DataSource;
 import java.util.Map;
 
 /**
@@ -112,5 +113,34 @@ public class MyTest {
         BossController bean = application.getBean(BossController.class);
         System.out.println(bean);
 
+    }
+
+    @Test
+    public void testProfile(){
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(MainConfigProfile.class);
+        String[] names = context.getBeanNamesForType(DataSource.class);
+        for (String name:names
+             ) {
+            System.out.println(name);
+        }
+    }
+
+    @Test
+    public void testProfile01(){
+        //创建applicationContext
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+        //设置需要激活的环境
+        context.getEnvironment().setActiveProfiles("test","dev");
+        //注册主配置类
+        context.register(MainConfigProfile.class);
+        //启动刷新容器
+        context.refresh();
+        String[] names = context.getBeanNamesForType(DataSource.class);
+        for (String name:names
+        ) {
+            System.out.println(name);
+        }
+        Object yellow = context.getBean("yellow");
+        System.out.println(yellow);
     }
 }

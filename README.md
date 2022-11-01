@@ -108,4 +108,12 @@
 - 自定义组件使用spring容器底层的一些组件（ApplicationContext,BeanFactory,xxx）
 > 自定义组件只需要实现xxxAware接口,在创建对象的时候，会调用接口的方法注入相关组件（spring底层的一些组件）
 > ApplicationContextAware是使用ApplicationContextAwareProcessor来处理的，相关的aware是有相关的Processor来处理（后置处理器机制）
+- @Profile
+> 指定组件在哪个环境中被激活，不指定则任何环境都能注册这个组件
+> 加了环境标识的bean只有对应的环境才能激活bean,默认@Profile("default")
+> 修改启动环境：虚拟机运行参数：-Dspring.profiles.active=test
+> 代码的方式详情见testProfile01
+> @Profile("xx")写在类上则只有激活的环境该类才生效，没有标注的在所有环境下都会被加载
+- spring AOP
+> 面向切面编程有一下通吃动作：前置@Before 后置@After 返回@AfterReturning 异常@AfterThrowing 环绕@Around
 > 

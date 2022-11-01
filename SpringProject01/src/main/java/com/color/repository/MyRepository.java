@@ -10,4 +10,20 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public class MyRepository {
+    private String label="label1";
+
+    public String getLabel() {
+        return label;
+    }
+
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
+    @Override
+    public String toString() {
+        return "MyRepository{" +
+                "label='" + label + '\'' +
+                '}';
+    }
 }

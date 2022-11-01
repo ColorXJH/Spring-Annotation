@@ -88,4 +88,24 @@
 - @Autowired
 > 自动装配，依赖注入时，IOC容器对各个组件依赖间的赋值
 > 1:默认优先按照类型去容器中找对应组件，找到就赋值
-> 2:如果有多个类型的组件
+> 2:如果有多个类型的组件,在依赖注入的时候显示按照类型查找，找到有多个则再按照名称查找，匹配则自动装配，不匹配则报错
+> 这是对于依赖注入而言，如果再IOC容器中直接按照类型查找bean，则会报错，
+> 关于@Autowired与@Resource注解的区别，@Autowired默认按照类型然后再按照名称匹配
+> @Resource默认按照名称匹配，找不到则找类型唯一匹配
+> 配合@Qualifier指定使用哪一个Bean组件的id,而不是使用属性名==》这个注解等价与@Primary标注的哪个bean表示优先被使用（默认）
+> @Qualifier比@Primary优先级更高，同时使用则以@Qualifier为准
+> required=false表示这组件不是必须被注入的，如果找到了则注入，找不到则不注入
+- @Resource
+> JSR250标准注解
+- @Inject
+> JSR330标准注解,需要导入javax.inject依赖
+> AutowiredAnnotationBeanPostProcessor:解析完成自动装配功能
+- @Autowired注解使用位置说明
+> 可以被标注在构造器，参数，方法，属性上，
+> 当在构造器上时，并且当类中只有一个有参构造器时，这个@Autowired其实是可以省略的
+> 当在方法上时，配合@Bean+方法参数，参数从容器中获取，默认不写@Autowired,都能自动装配
+> 当放在参数位置，类似放在set方法位置上或者构造器方法上
+- 自定义组件使用spring容器底层的一些组件（ApplicationContext,BeanFactory,xxx）
+> 自定义组件只需要实现xxxAware接口,在创建对象的时候，会调用接口的方法注入相关组件（spring底层的一些组件）
+> ApplicationContextAware是使用ApplicationContextAwareProcessor来处理的，相关的aware是有相关的Processor来处理（后置处理器机制）
+> 

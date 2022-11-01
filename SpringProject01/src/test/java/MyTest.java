@@ -1,5 +1,6 @@
 import com.color.bean.Person;
 import com.color.config.*;
+import com.color.controller.BossController;
 import com.color.controller.MyController;
 import com.color.repository.MyRepository;
 import org.junit.Test;
@@ -94,8 +95,22 @@ public class MyTest {
     public void testAutowired(){
         AnnotationConfigApplicationContext application = new AnnotationConfigApplicationContext(MainConfigAutowired.class);
         MyController bean = application.getBean(MyController.class);
-        MyRepository bean1 = application.getBean(MyRepository.class);
+        MyRepository bean2 = (MyRepository)application.getBean("myRepository2");
+        Object dog = application.getBean("dog");
+        Object mySchool = application.getBean("mySchool");
+        //无论如何这一行是肯定要报错的，
+        //MyRepository bean3 = application.getBean(MyRepository.class);
         System.out.println(bean);
-        System.out.println(bean1);
+        System.out.println(bean2);
+        System.out.println(dog);
+        System.out.println(mySchool);
+
+    }
+    @Test
+    public void testAutowired2(){
+        AnnotationConfigApplicationContext application = new AnnotationConfigApplicationContext(MainConfigAutowired.class);
+        BossController bean = application.getBean(BossController.class);
+        System.out.println(bean);
+
     }
 }

@@ -124,3 +124,26 @@
 > 利用AspectJAutoProxyRegistrar自定义给容器中注册bean,这个组件什么时候工作。这个组件功能是什么
 > internalAutoProxyCreator= AnnotationAwareAspectJAutoProxyCreator（他是一个后置处理器也是一个Aware实现类（BeanFactoryAware））
 > 关注后置处理器（在bean初始化完成前后做事）,自动装配BeanFactoryAware
+> 流程：
+> 1：传入配置类，创建IOC容器
+> 2：注册配置类，调用refresh()，刷新容器
+> 3：registerBeanPostProcessors(beanFactory);注册bean的后置处理器来方便拦截bean的创建
+>       3.1）：先获取ioc容器已经定义了的需要创建对象的所有BeanPostProcessor
+>       3.2）：给容器中加入别的BeanPostProcessor
+>       3.3）：优先注册实现了PriorityOrdered接口的BeanPostProcessor
+>       3.4）：仔给容器中注册实现了Ordered接口的BeanPostProcessor
+>       3.5）：注册没实现优先级接口的BeanPostProcessor
+>       3.6）：注册BeanPostProcessor,实际上就是创建BeanPostProcessor对象，保存仔容器中
+>               创建internalAutoProxyCreator的BeanPostProcessor[AnnotationAwareAspectJAutoProxy]
+>               1:创建bean的实例
+>               2:populateBean(BeanName,mbd,instanceWrapper)(给bean的各种属性赋值)
+>               3:initializeBean 初始化bean
+>                   1:invokeAwareMethods():处理Aware接口的方法回调
+>                   2:applyBeanPostProcessorsBeforeInitialization()：应用后置处理器的BeforeInitialization()
+>                   3:invokeInitMethods():执行自定义的初始化方法
+>                   4:applyBeanPostProcessorsAfterInitialization():执行后置处理器的PostProcessorsAfterInitialization()
+>               4：BeanPostProcessor(AnnotationAwareAspectJAutoProxyCreator)创建成功--》aspectJAdvisorsBuilder    
+>       3.7）：把BeanPostProcessor注册到BeanFactory中：
+>               beanFactory.addBeanPostProcessor(postProcessor)
+- AnnotationAwareAspectJAutoProxyCreator执行时机
+> 

@@ -1,3 +1,4 @@
+import com.color.aop.MathCalculator;
 import com.color.bean.Person;
 import com.color.config.*;
 import com.color.controller.BossController;
@@ -142,5 +143,12 @@ public class MyTest {
         }
         Object yellow = context.getBean("yellow");
         System.out.println(yellow);
+    }
+
+    @Test
+    public void testAop(){
+        AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(MainConfigAop.class);
+        MathCalculator bean = context.getBean(MathCalculator.class);
+        bean.div(1,1);
     }
 }

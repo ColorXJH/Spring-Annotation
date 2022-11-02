@@ -115,5 +115,12 @@
 > 代码的方式详情见testProfile01
 > @Profile("xx")写在类上则只有激活的环境该类才生效，没有标注的在所有环境下都会被加载
 - spring AOP
-> 面向切面编程有一下通吃动作：前置@Before 后置@After 返回@AfterReturning 异常@AfterThrowing 环绕@Around
-> 
+> 面向切面编程有一下通知动作：前置@Before 后置@After 返回@AfterReturning 异常@AfterThrowing 环绕@Around
+> 1：将业务逻辑组件和切面组类都加入到容器中，告诉spring哪个是切面类（@Aspect）
+> 2：在切面类上的每一个通知方法上标注通知注解，告诉spring何时何地运行（切入点表达式）
+> 3：开启基于注解的aop模式（@EnableAspectJAutoProxy）
+- aop原理
+> @EnableAspectJAutoProxy==>@Import({AspectJAutoProxyRegistrar.class})，给容器中导入组件
+> 利用AspectJAutoProxyRegistrar自定义给容器中注册bean,这个组件什么时候工作。这个组件功能是什么
+> internalAutoProxyCreator= AnnotationAwareAspectJAutoProxyCreator（他是一个后置处理器也是一个Aware实现类（BeanFactoryAware））
+> 关注后置处理器（在bean初始化完成前后做事）,自动装配BeanFactoryAware

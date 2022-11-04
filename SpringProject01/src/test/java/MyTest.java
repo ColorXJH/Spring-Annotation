@@ -4,6 +4,8 @@ import com.color.config.*;
 import com.color.controller.BossController;
 import com.color.controller.MyController;
 import com.color.repository.MyRepository;
+import com.color.service.UserService;
+import com.color.transction.TransactionConfig;
 import org.junit.Test;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
@@ -151,4 +153,12 @@ public class MyTest {
         MathCalculator bean = context.getBean(MathCalculator.class);
         bean.div(1,1);
     }
+    @Test
+    public void testTx(){
+        AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(TransactionConfig.class);
+        UserService bean = applicationContext.getBean(UserService.class);
+        bean.insertUser();
+        applicationContext.close();
+    }
+
 }

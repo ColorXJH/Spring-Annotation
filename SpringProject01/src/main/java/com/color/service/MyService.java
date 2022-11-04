@@ -5,7 +5,6 @@ import com.color.bean.Dog;
 import com.color.bean.MySchool;
 import com.color.repository.MyRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
@@ -16,7 +15,7 @@ import javax.inject.Inject;
  * @description:
  * @date 2022/10/21 9:56
  */
-@Service
+//@Service
 public class MyService {
     @Autowired
     //@Qualifier("myRepository2")//指定使用组件的id,而不是默认使用属性名==>@Primary标注的bean

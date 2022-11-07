@@ -3,10 +3,12 @@ import com.color.bean.Person;
 import com.color.config.*;
 import com.color.controller.BossController;
 import com.color.controller.MyController;
+import com.color.ext.ExtConfig;
 import com.color.repository.MyRepository;
 import com.color.service.UserService;
 import com.color.transction.TransactionConfig;
 import org.junit.Test;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import javax.sql.DataSource;
@@ -158,6 +160,25 @@ public class MyTest {
         AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(TransactionConfig.class);
         UserService bean = applicationContext.getBean(UserService.class);
         bean.insertUser();
+        applicationContext.close();
+    }
+    @Test
+    public void testExt(){
+        AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(ExtConfig.class);
+
+        applicationContext.close();
+    }
+
+    @Test
+    public void testExtPublishEvent(){
+        AnnotationConfigApplicationContext applicationContext = new AnnotationConfigApplicationContext(ExtConfig.class);
+        //发布事件
+        applicationContext.publishEvent(new ApplicationEvent(new String("---我发布的事件--color---xjh--")) {
+            @Override
+            public String toString() {
+                return super.toString();
+            }
+        });
         applicationContext.close();
     }
 

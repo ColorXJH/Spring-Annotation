@@ -7,4 +7,7 @@ package com.color.bean;
  * @date 2022/10/27 16:24
  */
 public class Blue {
+    public Blue(){
+        System.out.println("Blue---Constructor---");
+    }
 }

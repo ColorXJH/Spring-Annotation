@@ -1,5 +1,8 @@
 package com.color.ext;
 
+import com.color.bean.Blue;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 /**
@@ -9,5 +12,12 @@ import org.springframework.context.annotation.Configuration;
  * @date 2022/11/4 11:47
  */
 @Configuration
+@ComponentScan("com.color.ext")
 public class ExtConfig {
+    @Bean
+    public Blue blue(){
+        return new Blue();
+    }
+
+
 }

@@ -230,7 +230,7 @@
 
 ```
 - 事务
-```aidl
+```
  * 环境搭建：
  * 1：导入相关依赖（数据源，数据库驱动，spring-jdbc模块）
  * 2：配置数据源，jdbcTemplate 操作数据库
@@ -260,6 +260,57 @@
  *  整个流程和aop基本一致
 ```
 - 扩展原理
-```aidl
+```
+1:BeanPostProcessor:bean后置处理器，bean创建对象初始化前后进行拦截工作了
+2:BeanFactoryPostProcessor:BeanFactory的后置处理器，
+    在BeanFactory标准初始化之后调用，所有的Bean定义已经保存加载到beanFactory中
+    但是bean的实例还未创建
+    时机：
+        1：ioc容器创建对象，
+        2；invokeBeanFactoryPostProcessors(beanFactory),执行beanFactoryPostProcessor
+            如何找到所有的BeanFactoryPostProcessor并执行其他的方法
+                1：直接在BeanFactory中找到所有类型是BeanFactoryPostProcessor的组件，并执行他们的方法
+                2：在初始化创建其他组件前面执行
+                
+3：BeanDefinationRegistryPostProcessor
+    是BeanFactoryPostProcessor的子接口
+    有方法postProcessBeanDefinationRegistry()：在所有bean定义信息将要被加载但是bean实例还未创建的时候执行
+    由此得出上述方法在BeanFactoryPostProcessor类执行之前执行,可以利用该类给容器中再额外添加组件      
+    原理：
+    1：ioc创建对象
+    2：refresh()->invokeBeanFactoryPostProcessors(beanFactory)
+    3:从容器中获取所有的BeanDefinitionRegistryPostProcessor组件
+        1：依次触发postProcessBeanDefinitionRegistry
+        2：再来触发postProcessBeanFactory()方法
+    4：再来从容器中找到BeanFactoryPostProcessor组件，然后依次触发postProcessBeanFactory()方法
 
+4：ApplicationListener:应用程序监听器
+    监听容器中发布的事件，完成事件驱动模型的开发
+    public interface ApplicationListener<E extends ApplicationEvent> extends EventListener
+        监听ApplicationEvent及其下面的子事件
+    步骤：
+        1：写一个监听器来监听某个事件(ApplicationEvent及其子类)
+        2：把监听器放在容器中
+        3；只要容器中有相关事件的发布，我们就能监听到该事件
+            ContextRefreshedEEvent:容器刷新完成事件（所有bean都完全创建），会发布整个事件（spring发布）
+            。。。
+        4：如何发布事件
+            application.publishEvent(要发布的事件)
+        5：发布与监听机制原理，以ContextRefreshedEEvent为例
+            1：容器创建对象，refresh()
+            2：sihishRefresh()；容器刷新完成
+       事件发布流程
+            3：publishEvent(new ContextRefreshEvent(this))
+                    1：获取事件的多播器（派发器）：getApplicationEventMulticaster()
+                    2：MulticastEvent派发事件
+                    3：获取到所有的AppplicationListener
+                        for 循环遍历
+                        1：如果有Executor可以支持使用Executor异步派发：Executor executor=getTaskExecutor();
+                        2：否则，同步的方式直接执行listener方法：invokeListener(listener,event)
+                            拿到listener,回调onApplicationEvent方法
+                            
+       获取事件的多播器（派发器）
+            refresh()->initApplicationEventMulticaster(),初始化  ApplicationEventMulticaster，然后讲listener注册到其中       
+    
+              
 ```

@@ -290,6 +290,13 @@
         监听ApplicationEvent及其下面的子事件
     步骤：
         1：写一个监听器来监听某个事件(ApplicationEvent及其子类)
+            或者使用@EventListener注解，让任意方法都可以监听事件
+            使用EventListenerMethodProcessor处理器来解析方法上的@EventListener注解
+            SmartInitializingSingleton原理
+                1：ioc容器创建对象，refresh()
+                2：finishBeanFactoryInitialization(beanFactory);初始化剩下的单实例bean
+                    1：先创建所有的单实例bean，getBena()
+                    2：获取创建好的单实例bean,判断是否是SmartInitializingSingleton类型，如果是，则调用afterSingletonsInstantiated()方法
         2：把监听器放在容器中
         3；只要容器中有相关事件的发布，我们就能监听到该事件
             ContextRefreshedEEvent:容器刷新完成事件（所有bean都完全创建），会发布整个事件（spring发布）
@@ -314,3 +321,104 @@
     
               
 ```
+- spring源码流程
+```
+1:spring容器的refresh()创建刷新过程
+    1：prepareRefresh();刷新预处理
+        1：initPropertySources()：初始化属性设置，子类自定义实现，个性化的属性设置
+        2：this.getEnvironment().validateRequiredProperties();属性校验
+        3：this.earlyApplicationEvents = new LinkedHashSet();保存容器中的一些事件
+    2：ConfigurableListableBeanFactory beanFactory = this.obtainFreshBeanFactory();获取beanFactory
+        1:this.refreshBeanFactory();刷新（创建）beanFactory
+            创建了一个this.beanFactory=new DefaultListableBeanFactory(),设置id
+        2：this.getBeanFactory();返回GenericApplicationContext创建的beanFactory对象
+        3：讲创建的BeanFactory返回-》DefaultListableBeanFactory返回
+    3：this.prepareBeanFactory(beanFactory);beanFactory的预准备工作
+        1：设置BeanFactory的类加载器，支持的表达式解析器。。。。
+        2：添加部分BeanPostProcessor[ApplicationContextAwareProcessor]
+        3：设置忽略的自动装配接口：EnvironmentAware.class
+            --这些接口的实现类，不能通过接口类型自动注入
+        4：注册可以解析的自动配装备：（我们能直接再任何组件中自动注入，例如BeanFactory，ResourceLoader，ApplicationEventPublisher，ApplicationContext）
+        5：添加beanFactory.addBeanPostProcessor(new ApplicationListenerDetector(this));（后置处理器）
+        6：添加编译时的AspectJ支持
+        7：给beanFactory中注入一些能用的组件，例如：enviroment[ConfigurableEnviroment] systemProperties[Map<String,Object>] systemEnviroment[Map<String,Object>]
+    4：postProcessBeanFactory(beanFactory);beanFactory准备工作完成后的后置处理工作
+        1：子类通过重写这个方法来在BeanFactory创建并预准备完成后做进一步的设置
+--------------------beanFactory创建以及预准备工作
+    5：invokeBeanFactoryPostProcessors(beanFactory);执行BeanFactoryPostProcessors的方法
+        beanFactory的后置处理器，在beanFactory标准初始化之后执行的（就是上方的前4步）
+        两个接口
+        BeanFactoryPostProcessor
+        BeanDefinitionRegistryPostProcessor
+        1:执行invokeBeanFactoryPostProcessors的方法
+            1：获取所有的BeanDefinitionRegistryPostProcessor
+            2：先执行实现了PriorityOrdered.class优先级接口的BeanDefinitionRegistryPostProcessor
+                postProcessor.postProcessBeanDefinitionRegistry(registry);
+            3：再执行实现了Ordered.class顺序接口的BeanDefinitionRegistryPostProcessor
+                postProcessor.postProcessBeanDefinitionRegistry(registry);
+            4：最后执行没有实现优先级，顺序接口的BeanDefinitionRegistryPostProcessor    
+                postProcessor.postProcessBeanDefinitionRegistry(registry);
+            5:再执行BeanFactoryPostProcessor的方法
+                1：获取所有的BeanFactoryPostprocessor
+                2：先执行实现了PriorityOrdered.class优先级接口的BeanFactoryPostprocessor
+                    postProcessor.postProcessBeanFactory;
+                3：再执行实现了Ordered.class顺序接口的BeanFactoryPostprocessor
+                    postProcessor.postProcessBeanFactory;
+                4：最后执行没有实现优先级，顺序接口的BeanFactoryPostprocessor    
+                    postProcessor.postProcessBeanFactory;
+    6：registerBeanPostProcessors(beanFactory);注册BeanPostProcessors（bean的后置处理器）
+        用来拦截bean的创建过程
+        1：获取所有的BeanPostProcessor，后置处理器都默认可以通过了PriorityOrdered,Ordered接口来指定优先级
+            不同接口类型的BeanPostProcessor，在bean创建前后执行的时机是不一样的
+            BeanPostProcessor
+            DestructionAwareBeanPostProcessor
+            InstantiationAwareBeanPostProcessor
+            SmartInstantiationAwareBeanPostProcessor
+            MergedBeanDefinitionPostProcessor【internalPostProcessors】
+        2：先注册PriorityOrdered优先级接口的BeanPostProcessor
+            把每一个BeanPostProcessor添加到BeanFactory中
+            beanFactory.addBeanPostProcessor
+        3：再注册实现Ordered接口的
+        4：最后注册没有实现任何优先级接口的
+        5：最终注册MergedBeanDefinitionPostProcessor
+        6：注册一个ApplicationListenerDetector，来在bean创建完成后检查是否是ApplicationListener,
+            如果是：则：beanFactory.addBeanPostProcessor(new ApplicationListenerDetector(applicationContext));    
+    7：initMessageSource();初始化MessageSource组件(国际化功能，消息绑定，消息解析)
+        1：获取beanFactory:ConfigurableListableBeanFactory beanFactory = getBeanFactory();
+        2：看容器中是否有id为messageSource的组件，   
+            如果有，赋值给messageSource属性，如果没有则创建DelegatingMessageSource   
+                MessageSource：取出国际化配置文件中的某个key的值，能按照区域信息获取
+        3：把创建好的MessageSource注册到容器中，以后获取国际化配置文件的值时，可以自动注入MessageSource
+           beanFactory.registerSingleton(MESSAGE_SOURCE_BEAN_NAME, this.messageSource);
+           messageSource.getMessage()                        
+    8：initApplicationEventMulticaster();初始化事件派发器
+        1：获取BeanFactory
+        2：从BeanFactory中获取名称为applicationEventMulticaster的ApplicationEventMulticaster
+        3：如果上一步没有配置，则创建一个SimpleApplicationEventMulticaster
+        4：将创建的SimpleApplicationEventMulticaster添加到BeanFactory中，以后其他组件直接自动注入
+    9：onRefresh(); 
+        1：留给子容器（子类），子类可以重写该方法，在容器刷新的时候可以自定义逻辑
+    10：registerListeners();给容器中将所有项目里面的ApplicationListener注册进来
+        1：从容器中拿到所有的ApplicationListener
+        2：将每个监听器添加到事件派发器中
+            getApplicationEventMulticaster().addApplicationListener(listener);
+        3：派发之前步骤产生的事件
+    11：finishBeanFactoryInitialization(beanFactory);初始化所有剩下的单实例bean
+        1:beanFactory.preInstantiateSingletons();初始化后面剩下的单实例bean
+            1:DefaultListableBeanFactory.preInstantiateSingletons() 
+                1:获取容器中的所有的剩余的no-lazy Bean,依次进行初始化和创建对象
+                2：获取bean的定义信息：RootBeanDefinition
+                3：bean不是抽象的，是单实例的，不是懒加载的       
+                    1：判断是否是FactoryBean(是否是实现FactoryBean接口的Bean)-->(spring的工厂模式)
+                       会调用工厂bean的getObject放啊创建bean对象
+                    2：不是工厂bean，则调用getBean()创建对象
+                        1:getBean(beanName)->ioc。getBean()
+                        2:doGetBean()    
+                        3:先获取缓存中的单实例bean,如果能获取到，则说明这个bean之前被创建过（所欲创建过的单实例bean都会被缓存起来）
+                            private final Map<String, Object> singletonObjects = new ConcurrentHashMap<String, Object>(256);
+                        4:缓存中拿不到则开始bean的创建对象流程
+                        5：标记当前bean已经被创建
+                        6：获取bean的定义信息
+                        7：获取当前bean依赖的其他bean                
+             
+```         

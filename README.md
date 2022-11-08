@@ -419,6 +419,35 @@
                         4:缓存中拿不到则开始bean的创建对象流程
                         5：标记当前bean已经被创建
                         6：获取bean的定义信息
-                        7：获取当前bean依赖的其他bean                
-             
+                        7：获取当前bean依赖的其他bean，如果有按照getBean()把依赖的bean先创建出来
+                        8：启动单实例bean的创建流程
+                            1：createBean(beanName, mbd, args);
+                            2：Object bean = resolveBeforeInstantiation(beanName, mbdToUse);让beanPostProcessor先拦截返回代理对象
+                                  InstantiationAwareBeanPostProcessor，提前执行，触发postProcessBeforeInstanttiation()
+                                  如果前一个方法有返回值，则触发postProcessAfterInitialization();
+                            3：如果前面的InstantiationAwareBeanPostProcessor没有返回代理对象，则调用
+                                Object beanInstance = doCreateBean(beanName, mbdToUse, args);创建bean
+                                    1：instanceWrapper = createBeanInstance(beanName, mbd, args);创建bean实例，利用工厂方法或对象构造器创建bean实例
+                                    2：applyMergedBeanDefinitionPostProcessors(mbd, beanType, beanName);
+                                        1：bdp.postProcessMergedBeanDefinition(mbd, beanType, beanName);               
+                                        2：populateBean(beanName,mbd,instanceWrapper)bean属性赋值
+                                          赋值之前，
+                                            1：拿到InstantiationAwareBeanPostProcessor类型的后置处理器，执行postProcessAfterInitialization();
+                                            2：拿到InstantiationAwareBeanPostProcessor后置处理器，执行postProcessPropertyValues()
+                                          赋值
+                                            3：applyPropertyValues(beanName,mbd,bw,pvs)应用bean属性的值，为属性使用setter方法等进行赋值  
+                                        3：bean初始化：initializeBean(beanName,exposedObject,mbd)
+                                            1:invokeAwareMethods(beanName,bean);执行xxxAware接口方法 
+                                                BeanNameAware,BeanClassLoaderAware,BeanFactoryAware
+                                            2：wrappedBean = applyBeanPostProcessorsBeforeInitialization(wrappedBean, beanName);执行后置处理器初始化之前的方法
+                                                BeanPostProcessor.postprocessBeforeInitialization
+                                            3：invokeInitMethods(beanName,wrappedBean,mbd):执行初始化方法
+                                                1：是否是InitializingBean接口的实现，执行接口规定的初始化
+                                                2：是否自定义初始化方法                                
+                                            4： 执行后置处理器初始化之后 applyBeanPostProcessorsAfterInitialization()
+                                                    BeanPostProcessor.postProcessAfterInitialization()
+                                            5：注册bean的销毁方法
+                                4:将创建的bean添加到缓存中singletonObjects
+                                ioc容器就是这些很多的Map，保存了单实例bean,环境信息                    
+                                                             
 ```         

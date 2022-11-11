@@ -1,3 +1,5 @@
+package com.color;
+
 import com.color.bean.Person;
 import com.color.config.MyConfig;
 import org.springframework.context.ApplicationContext;

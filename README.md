@@ -448,6 +448,50 @@
                                                     BeanPostProcessor.postProcessAfterInitialization()
                                             5：注册bean的销毁方法
                                 4:将创建的bean添加到缓存中singletonObjects
-                                ioc容器就是这些很多的Map，保存了单实例bean,环境信息                    
-                                                             
+                                ioc容器就是这些很多的Map，保存了单实例bean,环境信息     
+                            4:所有bean都利用getBean创建完成后：
+                                检查所有的bean是否是SmartInitializingSingleton接口的，如果是就执行afterSingletonsInstantited();                  
+    12：finishRefresh();完成BeanFactory的初始化创建工作，IOC容器就创建完成了
+        1：this.initLifecycleProcessor();初始化生命周期有关的后置处理器：LifecycleProcessor，默认从生命周期找，如果没有则new一个，并且加入到r用其中
+            允许我们写一个LifecycleProcessor的实现类，可以在BeanFactory的onRefresh()，onClose()时候初始化生命周期
+        2：this.getLifecycleProcessor().onRefresh();拿到前面定义的生命周期处理器（BeanFactory），回调onRefresh()
+        3：this.publishEvent((ApplicationEvent)(new ContextRefreshedEvent(this)));发布容器刷新完成事件，
+        4：LiveBeansView.registerApplicationContext(this);
+==总结==
+1：spring容器在启动的时候，先会保存所有注册进来的bean的定义信息
+    1：xml注册bean <bean>
+    2：注解bean @Servece,@Component,@Bean...
+2：spring容器会在合适的时机创建这些Bean
+    1：用到这个Bean的时候：利用getBean方法创建这个Bean,创建好之后保存在容器中
+    2：同意创建剩下所有bean的时候：finishBeanFactoryInitialization(beanFactory);初始化所有剩下的单实例bean
+3：后置处理器：
+    1：每一个bean创建完成，都会使用后置处理器进行处理，增强bean的功能          
+        例如：AutowiredAnnotationBeanPostProcessor:处理自动注入功能
+        AnnotationAwareAspectJAutoProxyCreator:来做aop功能
+4：事件驱动模型
+    ApplicationListener:事件监听
+    ApplicationEventMulticaster事件派发                                                                   
 ```         
+- Servlet3.0
+```
+原来的servlet,filter,listener 定义在web.xml
+包括DispatcherServlet 整合Spring也是定义在web.xml中
+servlet3.0属于JSR315系列规范，需要tomcat7及以上容器支持，如果需要下载servlet规范文档，参考
+https://www.jcp.org/en/home/index ==>查找servlet下载
+
+现在可以使用注解@WebServlet(name = "helloServlet", value = "/hello-servlet")
+包括@WebListener,@WebFilter
+```
+- Shared library(共享库) / runtimes pluggability (运行时插件)
+```
+1:servlet容器启动，会扫描当前应用里面每一个jar包的ServletContainerInitializer的实现
+2：提供ServletContainerInitializer的实现类
+    实现类必须绑定在 META-INF/services/javax.servlet.ServletContainerInitializer
+    文件的内容就是ServletContainerInitializer的实现类的全类名
+
+总结：容器在启动应用的时候，会扫描当前应用每一个jar包里面META-INF/services/javax.servlet.ServletContainerInitializer
+指定的实现类，启动并运行这个实现类的方法 ,穿入感兴趣的类型
+       ServletContainerInitializer接口     
+       @HandleTypes注解
+
+```

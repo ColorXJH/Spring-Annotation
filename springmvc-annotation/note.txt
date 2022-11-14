@@ -1,0 +1,20 @@
+1:web容器在启动的过程中，会扫描每个jar包下的NETA-INF/services/javax.servlet.ServletContainerInitializer
+2:加载这个文件夹指定的类：SpringServletContainerInitializer
+3:spring的应用一启动就会加载感兴趣的WebApplicationInitializer接口下的所有组件
+4:并且为WebApplicationInitializer组件创建对象（组件不是接口、抽象类）
+    1:AbstractContextLoaderInitializer,创建根容器，createRootApplicationContext();
+    2:AbstractDispatcherServletInitializer:
+        1:创建一个ioc容器，createServletApplicationContext();
+        2:创建了DispatcherServlet,createDispatcherServlet();
+        3:将创建的DispatcherServlet添加到ServletContext中
+                getServletMapping()
+    3:AbstractAnnotationConfigDispatcherServletInitializer:注解方式配置DispatcherServlet初始化器
+        创建根容器：createRootApplicationContext()
+            getRootConfigClasses();传入一个配置类
+        创建web的ioc容器：createServletApplicationContext();
+            创建一个注解方式的配置容器ioc(AnnotationConfigWebApplicationContext)
+==
+   总结：要以注解方式启动springMVC,继承AbstractAnnotationConfigDispatcherServletInitializer
+   实现抽象方法指定DispatcherServlet的配置信息
+
+

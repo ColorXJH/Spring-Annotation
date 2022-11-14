@@ -1,7 +1,7 @@
-package org.example;
+package com.example;
 
-import org.example.config.App;
-import org.example.config.Root;
+import com.example.config.AppConfig;
+import com.example.config.RootConfig;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 /**
@@ -21,7 +21,7 @@ public class MyWebAppInitializer extends AbstractAnnotationConfigDispatcherServl
      **/
     @Override
     protected Class<?>[] getRootConfigClasses() {
-        return new Class<?>[] { Root.class };
+        return new Class<?>[] { RootConfig.class };
     }
 
     /**
@@ -33,7 +33,7 @@ public class MyWebAppInitializer extends AbstractAnnotationConfigDispatcherServl
      **/
     @Override
     protected Class<?>[] getServletConfigClasses() {
-        return new Class<?>[] { App.class };
+        return new Class<?>[] { AppConfig.class };
     }
     /**
      * Description: 获取DispatcherServlet前端控制器的映射信息

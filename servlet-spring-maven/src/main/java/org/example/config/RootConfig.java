@@ -10,7 +10,7 @@ import org.springframework.stereotype.Controller;
  * @description:
  * @date 2022/11/14 15:47
  */
-@ComponentScan(value = "org.example.controller",excludeFilters = {
+@ComponentScan(value = {"org.example.controller"},excludeFilters = {
         @ComponentScan.Filter(type = FilterType.ANNOTATION,classes = {Controller.class})
         //spring的容器不扫描@Controller，父容器
 })

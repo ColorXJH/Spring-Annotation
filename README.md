@@ -495,3 +495,16 @@ https://www.jcp.org/en/home/index ==>查找servlet下载
        @HandleTypes注解
 
 ```
+- 定制SpringMVC
+```
+> 1:@EnableWebMvc注解：开启springmvc定制配置功能 ==><mvc:annotation-driven>
+> 2:配置组件（视图解析器，视图映射，静态资源映射，拦截器。。。。）
+>  extends WebMvcConfigurerAdapter
+```
+- servlet3.0异步请求处理
+```
+在servlet3.0之前，servlet采用Thread-Per-Request的方式处理请求：即每一次http请求都由某一个线程从头到尾负责
+如果一个请求需要进行IO操作，比如访问数据库，调用第三方接口服务，那么其所对应的线程将同步的等待IO操作完成，而IO操作是非常慢的
+所以此时的线程并不能及时的释放回线程池以供后续使用，在并发量越来越大的情况下，将带来严重的性能问题，即使是spring,structs这样的高层框架
+ye脱离不了这个桎梏，因为他们都是建立在servlet之上的，为了解决这个问题，servlet3.0引入了异步处理，然后在servlet3.1中又引入了非阻塞IO来进一步增强异步处理的性能
+```

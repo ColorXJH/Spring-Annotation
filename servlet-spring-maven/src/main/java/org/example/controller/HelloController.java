@@ -30,4 +30,13 @@ public class HelloController {
         String hello=helloService.sayHello("ColorXJH2");
         return hello;
     }
+    @RequestMapping("/success")
+    public String success(){
+        return "success";
+    }
+
+    /*@RequestMapping("/index")
+    public String index(){
+        return "index";
+    }*/
 }

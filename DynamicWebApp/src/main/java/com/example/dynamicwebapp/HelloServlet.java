@@ -1,8 +1,11 @@
 package com.example.dynamicwebapp;
 
-import java.io.*;
-import javax.servlet.http.*;
-import javax.servlet.annotation.*;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 /**
  * @author ColorXJH
@@ -18,6 +21,14 @@ public class HelloServlet extends HttpServlet {
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+        System.out.println(Thread.currentThread()+"start----");
+        try {
+            sayHello();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
         response.setContentType("text/html");
 
         // Hello
@@ -25,9 +36,16 @@ public class HelloServlet extends HttpServlet {
         out.println("<html><body>");
         out.println("<h1>" + message + "</h1>");
         out.println("</body></html>");
+        System.out.println(Thread.currentThread()+"end----");
     }
 
     @Override
     public void destroy() {
+    }
+
+
+    public void sayHello() throws InterruptedException {
+        System.out.println(Thread.currentThread()+"doing----");
+        Thread.sleep(3000);
     }
 }
